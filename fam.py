@@ -1,7 +1,9 @@
 from db import get_spouses, get_parents, get_individuals
-from gedfile import add_line
+from gedfile import add_line, append_record
 
 config = None
+fam_map = []
+fam_last_index = None
 
 def generate_family_records(config_file,individuals_in_group): 
     global config
@@ -66,22 +68,51 @@ def generate_spouses(individuals_in_group):
         add_line(1,person2_reltype,"@I{}@".format(person2))
         add_line(1,"MARR")
 
-        #Append the INDI records with FAMS attribute
-        #TO DO ******************
+        #Append the INDI records with FAMS attribute if the INDI is in this family
+        append_record("0 @I{}@ INDI".format(person1),1,"FAMS","@F{}@".format(idx))
+        append_record("0 @I{}@ INDI".format(person2),1,"FAMS","@F{}@".format(idx))
+      
+        #Store the FAM mappings because we need it for generate_children
+        global fam_map
+        fam_map.append((idx,(person1,person2)))
+        global fam_last_index
+        fam_last_index = idx
 
 def generate_children(individuals_in_group):
-    #Get parental details for the individuals in the group
+    #Get parent details for the individuals in the group
     scope = []
     for individual in individuals_in_group:
         scope.append(str(individual[0]))
 
-    parent_data = get_spouses(config['PARENTS'],scope)
+    parent_data = get_parents(config['PARENTS'],scope)
 
-    #For each person, add them to the FAM record that exists for their mother/father. 
-	#TO DO ******************
-    
-    #Create a new FAM for them if it doesn't exist
-    #TO DO ******************
-    
-	#Append the INDI records with FAMC attribute
-    #TO DO ******************
+    for individual in parent_data:
+        #Find the FAM record for the parents.
+        records = []
+        fam_id = None
+
+        if individual[1] and individual[2]:
+            records = [fam for fam in fam_map if fam[1] == (individual[1],individual[2]) or fam[1] == (individual[2],individual[1])]
+        
+        if len(records)>0:
+            fam_id = records[0][0]
+
+        if fam_id:
+            #Add them to the FAM record. 
+            append_record("0 @F{}@ FAM".format(str(fam_id)),1,"CHIL","@I{}@".format(individual[0]))
+        else:
+            #Create a new FAM record for the child if one doesn't exist (as long as at least one parent is known)
+            if individual[1] or individual[2]:
+                global fam_last_index
+                fam_id = fam_last_index+1
+                fam_last_index=fam_id
+                add_line(0,"@F{}@".format(fam_id),"FAM")
+                if individual[1]:
+                    add_line(1,"WIFE","@I{}@".format(individual[1]))
+                if individual[2]:
+                    add_line(1,"HUSB","@I{}@".format(individual[2]))
+                add_line(1,"CHIL","@I{}@".format(individual[0]))
+
+        if fam_id:
+            #Append the INDI record with FAMC attribute
+            append_record("0 @I{}@ INDI".format(individual[0]),1,"FAMC","@F{}@".format(str(fam_id)))

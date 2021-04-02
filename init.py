@@ -83,7 +83,6 @@ def process_file(group=None):
     #Save Output
     try:
         print('Saving to file...')
-        add_line(0,"TRLR")
         text_file = open(os.path.join(config['OPTIONS']['OUTPUT_PATH'],filename), "w")
         text_file.write(render_output())
         text_file.close()

@@ -6,7 +6,7 @@ def generate_individual_records(config,group=None):
         
     for row in data:
         id_number = str(row[0])
-        name = str(row[1]) + ' ' + str(row[2])
+        name = (str(row[1]) + ' ' + str(row[2])).replace("/","-")
         birth_date = str(row[4])
         death_date = str(row[5])
         sex = str(row[3]).upper()
