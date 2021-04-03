@@ -1,5 +1,6 @@
 from db import get_individuals, get_individual
 from gedfile import add_line, already_exists
+from datetime import datetime
 
 def generate_individual_records(config,group=None):
     data = get_individuals(config['INDIVIDUALS'],group)
@@ -10,6 +11,14 @@ def generate_individual_records(config,group=None):
         birth_date = row[4]
         death_date = row[5]
         sex = row[3]
+
+        if str(config['OPTIONS']['FORCE_FULL_DATES']).upper() == 'TRUE':
+            if birth_date:
+                birth_date = datetime.strptime(str(birth_date), str(config['OPTIONS']['SOURCE_DATE_FORMAT']))
+                birth_date = birth_date.strftime('%Y-%m-%d')
+            if death_date:
+                death_date = datetime.strptime(str(death_date), str(config['OPTIONS']['SOURCE_DATE_FORMAT']))
+                death_date = death_date.strftime('%Y-%m-%d')
 
         add_line(0,"@I{}@".format(id_number),"INDI")
         add_line(1,"NAME","/{}/".format(name))
