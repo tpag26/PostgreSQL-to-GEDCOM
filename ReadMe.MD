@@ -29,7 +29,7 @@ SOURCE_DATE_FORMAT=%%Y
 #OUTPUT_MODE can be set as 'SIMPLE' or 'ADVANCED'. 'SIMPLE' will output a single GEDCOM file with all records. 'ADVANCED' will output a separate GEDCOM file for each item in 'GROUPS', based on the values in 'GROUP_COLUMN'
 #GROUPS only required if OUTPUT_MODE is 'ADVANCED'
 #In 'ADVANCED' mode, if ENFORCE_REFERENTIAL_INTEGRITY is enabled, any individuals referenced in FAM records from other groups will also be included as INDI records to avoid a cross-referencing integrity issue. 
-#If FORCE_FULL_DATES is enabled, any partial dates that can be successfully parsed will be transformed into a YYYY-MM-DD format.
+#If FORCE_FULL_DATES is enabled, any partial dates that can be successfully parsed will be transformed into a 01 JAN 1901 format.
 
 [INDIVIDUALS]
 TABLE_NAME=persons

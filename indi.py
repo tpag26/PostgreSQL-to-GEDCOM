@@ -15,10 +15,10 @@ def generate_individual_records(config,group=None):
         if str(config['OPTIONS']['FORCE_FULL_DATES']).upper() == 'TRUE':
             if birth_date:
                 birth_date = datetime.strptime(str(birth_date), str(config['OPTIONS']['SOURCE_DATE_FORMAT']))
-                birth_date = birth_date.strftime('%Y-%m-%d')
+                birth_date = birth_date.strftime('%d %b %Y').upper()
             if death_date:
                 death_date = datetime.strptime(str(death_date), str(config['OPTIONS']['SOURCE_DATE_FORMAT']))
-                death_date = death_date.strftime('%Y-%m-%d')
+                death_date = death_date.strftime('%d %b %Y').upper()
 
         add_line(0,"@I{}@".format(id_number),"INDI")
         add_line(1,"NAME","/{}/".format(name))
