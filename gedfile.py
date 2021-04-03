@@ -6,7 +6,7 @@ def initialize_file():
 
 def add_line(hierarchy,type,value=None):
     global ged_data
-    if (value):
+    if value:
         ged_data.append(str(hierarchy) + ' ' + str(type) + ' ' + str(value))
     else:
         ged_data.append(str(hierarchy) + ' ' + str(type))
@@ -39,3 +39,19 @@ def append_record(parent,hierarchy,type,value=None):
 def render_output():
     add_line(0,"TRLR")
     return "\n".join(ged_data)
+
+def already_exists(record_id,record_type):
+    #check for duplicates
+    record = ""
+
+    if record_type=="FAM":
+        record = "0 @F{}@ FAM".format(str(record_id))
+    elif record_type=='INDI':
+        record = "0 @I{}@ INDI".format(str(record_id))
+    else:
+        raise Exception ('Invalid record type specified.')
+    
+    if record in ged_data:
+        return True
+    else:
+        return False

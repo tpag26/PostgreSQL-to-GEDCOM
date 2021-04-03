@@ -39,6 +39,19 @@ def get_individuals(config,group=None):
     conn.close()
     return individuals
 
+def get_individual(config,individual_id):
+    conn = psycopg2.connect(connstring)
+    cur = conn.cursor()
+    cur.execute(("SELECT {} FROM {} WHERE {}={};").format(
+        config['ID_COLUMN']+','+config['FIRSTNAME_COLUMN']+','+config['LASTNAME_COLUMN']+','+config['SEX_COLUMN']+','+config['BIRTHDATE_COLUMN']+','+config['DEATHDATE_COLUMN'],
+        config['TABLE_NAME'],
+        config['ID_COLUMN'],
+        individual_id))
+    individual = cur.fetchone()
+    cur.close()
+    conn.close()
+    return individual
+
 def get_spouses(config,individuals):
     conn = psycopg2.connect(connstring)
     cur = conn.cursor()

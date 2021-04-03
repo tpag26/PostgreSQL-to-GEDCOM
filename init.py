@@ -49,7 +49,7 @@ def process_file(group=None):
         print('Generating file header...')
         today = datetime.today()
         add_line(0,"HEAD")
-        add_line(1,"SOUR",config['OPTIONS']['AUTHOR'])
+        add_line(1,"SOUR",'POSTGRES2GEDCOM')
         if group:
             add_line(2,"NAME",config['OPTIONS']['NAME'] + ' - ' + str(group))
         else:
@@ -59,7 +59,7 @@ def process_file(group=None):
         add_line(2,"TIME",today.strftime("%H:%M:%S"))
         add_line(1,"FILE",filename)
         add_line(1,"GEDC")
-        add_line(2,"VERS","5.5")
+        add_line(2,"VERS","5.5.1")
         add_line(2,"FORM","LINEAGE-LINKED")
         add_line(1,"CHAR","UTF-8")
     except Exception as e:
@@ -83,7 +83,10 @@ def process_file(group=None):
     #Save Output
     try:
         print('Saving to file...')
-        text_file = open(os.path.join(config['OPTIONS']['OUTPUT_PATH'],filename), "w")
+        filepath = os.path.join(config['OPTIONS']['OUTPUT_PATH'],filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        text_file = open(filepath, "w")
         text_file.write(render_output())
         text_file.close()
         print('GEDCOM file generated successfully.')

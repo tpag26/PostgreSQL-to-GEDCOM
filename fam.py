@@ -1,5 +1,6 @@
 from db import get_spouses, get_parents, get_individuals
 from gedfile import add_line, append_record
+from indi import add_individual_record
 
 config = None
 fam_map = []
@@ -60,13 +61,20 @@ def generate_spouses(individuals_in_group):
         else:
             #If we don't have enough information, just make a guess as GEDCOM standard requires 1x HUSB and 1x WIFE record (even for same sex couples)
             person1_reltype = 'WIFE'
-            person2_reltype = 'HUSB'        
+            person2_reltype = 'HUSB'
+        
+        #Resolve any referential integrity issues
+        if str(config['OPTIONS']['ENFORCE_REFERENTIAL_INTEGRITY'].upper()) == 'TRUE':
+            if str(person1) not in scope:
+                add_individual_record(config,person1)
+            if str(person2) not in scope:
+                add_individual_record(config,person2)
 
         #Generate the GEDCOM FAM entries
         add_line(0,"@F{}@".format(idx),"FAM")
         add_line(1,person1_reltype,"@I{}@".format(person1))
         add_line(1,person2_reltype,"@I{}@".format(person2))
-        add_line(1,"MARR")
+        add_line(1,"MARR","Y")
 
         #Append the INDI records with FAMS attribute if the INDI is in this family
         append_record("0 @I{}@ INDI".format(person1),1,"FAMS","@F{}@".format(idx))
@@ -116,3 +124,10 @@ def generate_children(individuals_in_group):
         if fam_id:
             #Append the INDI record with FAMC attribute
             append_record("0 @I{}@ INDI".format(individual[0]),1,"FAMC","@F{}@".format(str(fam_id)))
+        
+        #Resolve any referential integrity issues
+        if str(config['OPTIONS']['ENFORCE_REFERENTIAL_INTEGRITY'].upper()) == 'TRUE':
+            if individual[1] and (str(individual[1]) not in scope):
+                add_individual_record(config,individual[1])
+            if individual[2] and (str(individual[2]) not in scope):
+                add_individual_record(config,individual[2])
